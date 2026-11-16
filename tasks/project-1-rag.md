@@ -51,7 +51,7 @@
 
 ### 1. Set up the repo and environment — Not started
 **Description**
-Create a git repo for this project (its own repo outside this workspace, for example `~/code/personal/rag-hybrid-search`; link it in `progress.md`), install `uv`, and create a Python project. Add `anthropic`, `sentence-transformers` and `numpy`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude and one test embedding.
+Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), install `uv`, and create a Python project. Add `anthropic`, `sentence-transformers` and `numpy`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude and one test embedding.
 **Learn:** `uv` basics (project init, `uv add`, `uv run`). Treat it like npm + nvm for Python.
 **Deliverables**
 - Repo with `pyproject.toml`, `.gitignore`, `.env.example`

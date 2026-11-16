@@ -25,7 +25,7 @@ Checkpoints (evidence in brackets):
 - [ ] Answers carry citations [example output]
 - [ ] Short write-up with before/after numbers [README link]
 
-Repo / links: `~/code/personal/rag-hybrid-search` (local only, not pushed)
+Repo / links: `projects/rag-hybrid-search` (own git repo, local only, not pushed)
 Notes: (none yet)
 
 ## Project 2: Agent + MCP server
@@ -96,7 +96,7 @@ Notes: (none yet)
 
 ## Log (newest first)
 
-- 2026-11-16: Created the local repo `rag-hybrid-search` for Project 1 (sibling folder, not pushed to GitHub). No task done yet.
+- 2026-11-16: Created the local repo `rag-hybrid-search` for Project 1 (inside `projects/`, not pushed to GitHub). No task done yet.
 - 2026-11-16: Workspace cleanup. Moved the Project 1 plan to `tasks/project-1-rag.md`, fixed paths in all files, rewrote `AGENTS.md`. No project work started yet.
 - 2026-11-15: Task plan for Project 1 added. No project work started yet.
 - 2026-11-15: Project set up. Custom instructions written, resource map added (`ai-native-engineer-resources.md`), this tracker created. No project work started yet.
