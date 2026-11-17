@@ -58,7 +58,7 @@ Create a git repo for this project (its own repo inside `projects/`, which this 
 - `scripts/smoke-test.ts`
 **Done when:** `npx tsx scripts/smoke-test.ts` prints a short Claude reply, an embedding vector length, and reranker scores for a few pairs.
 **Time:** ~1h
-**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); the TS smoke test (Claude + embedding + rerank spike) is still to write, so not Done.
+**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); 2026-11-17: repo re-initialised as TypeScript on `main` (Python kept on branch `python-version`). `scripts/smoke-test.ts` Claude half works (typecheck clean, reply printed, stop_reason `end_turn`). Embedding and rerank spike still to do, so not Done.
 
 ### 2. Choose and collect the document set — Not started
 **Description**
