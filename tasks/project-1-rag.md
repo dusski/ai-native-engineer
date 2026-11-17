@@ -49,7 +49,7 @@
 
 ## Phase A: Setup and data
 
-### 1. Set up the repo and environment — Not started
+### 1. Set up the repo and environment — In progress
 **Description**
 Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), install `uv`, and create a Python project. Add `anthropic`, `sentence-transformers` and `numpy`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude and one test embedding.
 **Learn:** `uv` basics (project init, `uv add`, `uv run`). Treat it like npm + nvm for Python.
@@ -58,7 +58,7 @@ Create a git repo for this project (its own repo inside `projects/`, which this 
 - `scripts/smoke_test.py`
 **Done when:** `uv run scripts/smoke_test.py` prints a short Claude reply and an embedding vector length.
 **Time:** ~1h
-**Result:**
+**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Embedding half not written yet, so not Done.
 
 ### 2. Choose and collect the document set — Not started
 **Description**

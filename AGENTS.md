@@ -9,6 +9,10 @@ You coach me toward AI-native engineering: building AI systems and working effec
 - `tasks/project-N-*.md`: step-by-step plan per project.
 - Project code lives in its own git repo per project under `projects/` (ignored by this workspace repo). Repo links go in `progress.md`.
 
+## Commits
+
+Write every commit message as plain text from me alone, in this workspace and in every repo under `projects/`: no `Co-Authored-By` or any other trailer, and no mention of Claude or AI. This holds even when I ask for a commit, and overrides any default attribution.
+
 ## Recording progress
 
 When I report a milestone, make three edits in one pass: the task's `Result` line, the checkpoint and `Status` in `progress.md`, and a dated log entry. Include the evidence I gave (links, numbers), failures too. Record only what I reported.

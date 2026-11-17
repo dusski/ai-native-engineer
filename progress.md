@@ -14,7 +14,7 @@ Resources for each project are in `ai-native-engineer-resources.md`. Step-by-ste
 ---
 
 ## Project 1: Production RAG (hybrid search, reranking, citations)
-Status: Not started
+Status: In progress
 Task plan: `tasks/project-1-rag.md` (16 tasks, 2 optional)
 
 Checkpoints (evidence in brackets):
@@ -96,6 +96,7 @@ Notes: (none yet)
 
 ## Log (newest first)
 
+- 2026-11-16: Project 1, task 1 in progress. uv project and deps committed; smoke test calls Claude successfully (stop_reason `end_turn`). Embedding check still missing. First run hit a 400 "credit balance too low" error before it passed.
 - 2026-11-16: Created the local repo `rag-hybrid-search` for Project 1 (inside `projects/`, not pushed to GitHub). No task done yet.
 - 2026-11-16: Workspace cleanup. Moved the Project 1 plan to `tasks/project-1-rag.md`, fixed paths in all files, rewrote `AGENTS.md`. No project work started yet.
 - 2026-11-15: Task plan for Project 1 added. No project work started yet.
