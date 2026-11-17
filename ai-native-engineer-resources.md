@@ -2,11 +2,13 @@
 
 Compiled 2026-11-15. Purpose: learning resources for becoming an AI engineer and working effectively with AI. Organised around five portfolio projects transcribed from a "5 REAL projects" TikTok post by algorithmswithpeter (screenshot: `images/1000043345.png`). The post's own advice: deploy the projects, measure results, showcase them on GitHub. Treat the project list as a skeleton.
 
+**Updated 2026-11-17:** added a second source post (six project cards by bashi_fuirkashi, "one skill = one project"). Nothing above or below was removed. New material is in sections 11 to 13, plus two rows in the section 0 table and one line in the project order.
+
 **Source trust labels**
 - **Primary** = official docs, vendor engineering blogs, original authors, publishers.
 - **Secondary** = third-party blogs, aggregators, roundups. Useful for discovery; verify before relying on specifics.
 
-**Suggested project order (opinion, not from a source):** 1 RAG, then 2 Agent + MCP, then 5 Evals (start the eval set during project 1), then 4 Self-host, then 3 Fine-tune (optional; try prompting or RAG first).
+**Suggested project order (opinion, not from a source):** 1 RAG, then 2 Agent + MCP, then 5 Evals (start the eval set during project 1), then 4 Self-host, then 3 Fine-tune (optional; try prompting or RAG first). **Added 2026-11-17:** projects 6 (semantic caching) and 7 (text-to-SQL with guardrails) are optional extensions from the second post; suggested slot is after 5 (see section 11.2).
 
 ---
 
@@ -19,6 +21,8 @@ Compiled 2026-11-15. Purpose: learning resources for becoming an AI engineer and
 | 3 | Fine-tune an LLM (LoRA/QLoRA) | HF LLM Course (LoRA chapter); Unsloth guide |
 | 4 | Self-host an LLM (vLLM) | vLLM docs (quickstart, benchmarking) |
 | 5 | AI evaluation pipeline (accuracy, latency, cost, security) | Hamel Husain evals; Anthropic "Demystifying evals"; Langfuse |
+| 6 | Semantic caching layer (second post, optional) | RedisVL SemanticCache guide; Anthropic prompt caching docs (a different thing) |
+| 7 | Text-to-SQL with guardrails (second post, optional) | Parse-and-validate plus a read-only DB role; OWASP LLM Top 10; BIRD paper for the metric |
 | - | Working faster with AI coding agents | Claude Code best practices; Simon Willison's Agentic Engineering Patterns; Claude Academy |
 | - | Backend and system design gaps | *Designing Data-Intensive Applications*, 2nd ed. |
 
@@ -135,3 +139,113 @@ Read roughly in this order:
 - MCP spec statelessness and SDK package details come partly from third-party pages (see section 4).
 - Prices, dates and course lengths from Secondary sources may be stale.
 - Nothing here was tested hands-on; all findings are from web search results as of 2026-11-15.
+
+---
+
+## 11. Second post (added 2026-11-17): "one skill = one project"
+
+**Source:** a post by bashi_fuirkashi, "One Skill = One Project", shown as six project cards in screenshots. The six screenshots are saved as `images/Screenshot_20261117-182747.png` to `images/Screenshot_20261117-182831.png`; this section is the text record. The post appears to promote a paid accelerator program; I noted that when transcribing and did not check the program or its terms. Which skill each card belongs to (RAG, evals, fine-tuning, guardrails and so on) is inferred from the card titles, and any partly obscured text is a best reading. Treat the cards as project ideas, not a curriculum. The stacks are the poster's choices, not requirements. The card steps below are paraphrased.
+
+### 11.1 How the six cards map onto the existing plan
+
+| Card | Maps to | Relationship | What to do with it |
+|---|---|---|---|
+| Hybrid Search RAG over Internal Docs | P1 | Same project, different stack | Variant. Keep the local stack in `tasks/project-1-rag.md`; the cloud stack is an optional rebuild |
+| Agent Orchestration System | P2 | Overlaps; adds backend-heavy parts | Variant. Combine with the MCP server from P2 |
+| Semantic Caching Layer | new P6 | New | Optional extension |
+| Automated Eval Dataset Generator | P5 | A component of P5 | Fold into P5 |
+| LoRA Fine-Tuning Pipeline | P3 | Same project, adds W&B tracking | Variant |
+| Text-to-SQL with Guardrails | new P7 | New | Optional extension |
+
+The first post's "self-host with vLLM" (P4) is not in the second post. Combined, the two posts cover seven distinct skills: RAG, agents, evals, fine-tuning, self-hosting, caching, guardrails.
+
+### 11.2 Recommended way to include them (opinion)
+
+- **Keep the numbering P1 to P5.** `progress.md`, `tasks/` and `job-postings.md` all refer to those numbers.
+- **Add P6 and P7 as optional extensions**, and record the other four cards as variants inside P1, P2, P3 and P5 rather than as new projects. Doing both versions of one skill adds little.
+- **Suggested order:** 1, 2, 5, then 6, then 7, then 4, then 3. P6 needs P5's eval and cost tracking to catch wrong cache hits and prove savings. P7 needs the error-analysis habit from P1 and P5.
+- **Fit with the Ruby Labs posting** (`job-postings.md`): P6 helps with the listed gap "PostgreSQL and caching (Redis, KV)" and with cost control. P7 helps with Postgres and with fallback flows for bad model output. Neither replaces the posting's production-experience requirement. The posting is TypeScript end to end, and the cards are Python. Language is your choice, so P6 could be built in TypeScript.
+- **Order of the task plans:** `tasks/` currently holds P1 only. Add task plans for P2, P5, P6 and P7 one at a time, in the same format.
+
+---
+
+## 12. Card details, notes and resources
+
+### 12.1 Hybrid Search RAG over Internal Docs (variant of P1)
+
+- **Card stack:** Python, LangChain, Claude API, Pinecone, rank_bm25, Cohere Rerank, FastAPI.
+- **Steps (paraphrased):** chunk and embed the documents into Pinecone; build a separate BM25 index over the same corpus; run both retrievers and merge with reciprocal rank fusion; rerank the merged set with Cohere and keep the top k; answer with inline citations and check each claim maps to a source.
+- **Notes:** this is the same pipeline as P1 tasks 6 to 12. The difference is a managed vector database and a hosted reranker, which need accounts and keys; free-tier terms were not checked. The local stack in the P1 plan needs none.
+- **Resources:**
+  - Pinecone on reciprocal rank fusion (Primary): RRF is a client-side method that fuses rankings instead of raw scores. https://docs.pinecone.io/guides/search/reciprocal-rank-fusion
+  - Pinecone hybrid search overview (Primary): notes that RRF is one fusion method, not a synonym for hybrid search. https://docs.pinecone.io/docs/hybrid-search
+  - Pinecone research, "An analysis of fusion functions for hybrid retrieval" (Primary, vendor research): compares convex-combination fusion with RRF. https://www.pinecone.io/research/an-analysis-of-fusion-functions-for-hybrid-retrieval/
+  - Cohere Rerank docs: URL not verified in this research.
+
+### 12.2 Agent Orchestration System (variant of P2)
+
+- **Card stack:** Python, LangGraph, Claude API, Redis, Postgres, FastAPI, Celery.
+- **Steps (paraphrased):** define an agent graph with plan, act and reflect nodes; register every tool with a typed input schema; persist memory in Redis between steps; add a human approval checkpoint for high-risk actions; log every step so failures can be replayed and debugged.
+- **Notes:** this variant targets your backend gaps (queue, persistence, approval flow). It has no MCP part, so use an MCP server as the tool layer to cover P2. Pushback: a plan/act/reflect graph can be overkill for a first agent. Anthropic's guidance (section 2, item 1) is to start simple and add structure only when needed, so start with a plain tool-calling loop and move to a graph when state and branching require it.
+- **Resources:**
+  - LangGraph persistence (Primary): a checkpointer saves a snapshot of graph state at every step, which enables human-in-the-loop, memory, time-travel debugging and fault tolerance. https://docs.langchain.com/oss/python/langgraph/persistence.md
+  - LangGraph human-in-the-loop (Primary): `interrupt()` pauses the graph, saves state, and waits for you to resume; it needs a checkpointer. https://docs.langchain.com/oss/python/langgraph/human-in-the-loop
+  - LangGraph checkpointers (Primary). https://docs.langchain.com/oss/python/langgraph/checkpointers
+  - Redis as the checkpointer, as on the card, was **not verified** in the docs I found. A database-backed checkpointer is the documented production direction, so Postgres (already on the card) is the safer choice. Check the current checkpointer list first.
+  - Replaying failures: trace each step with Langfuse (section 7).
+
+### 12.3 Semantic Caching Layer (new P6, optional)
+
+- **Card stack:** Python, FastAPI, Redis, OpenAI embeddings, FAISS, Claude API.
+- **Steps (paraphrased):** embed each incoming prompt before it reaches the model; search the cache for a semantically similar earlier prompt; above a similarity threshold return the cached answer; on a miss call the model and store the embedding with the response; track hit rate and money saved on a simple dashboard.
+- **Notes and pushback:**
+  - Redis and FAISS are both vector stores. Pick one. RedisVL's `SemanticCache` already includes thresholds and TTL; FAISS is a library without expiry.
+  - The card embeds with OpenAI for a Claude project. A local embedding model avoids a second vendor key, as in the P1 plan.
+  - The main risk is wrong hits. A looser threshold raises the hit rate and the wrong-answer rate together. Build a labelled set of paraphrase pairs and near-miss pairs (similar wording, different correct answer) and measure the false-hit rate before reporting savings.
+  - Scope the cache per user, tenant and system prompt, or answers can leak across users. RedisVL's guide covers tags and filters for multi-user access control.
+  - Do not confuse this with provider-side prompt caching. Report the two savings separately.
+- **Resources:**
+  - RedisVL LLM caching guide (Primary, versioned page; 0.14.0 was the newest seen): covers `SemanticCache`, the distance threshold (cosine, lower is stricter), TTL policies and access controls. https://redis.io/docs/latest/develop/ai/redisvl/0.14.0/user_guide/llmcache/
+  - Anthropic prompt caching (Primary): caches the prompt prefix; cache reads cost 0.1x the base input price; a 5-minute lifetime with a 1-hour option. https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching . A newer page on platform.claude.com also describes automatic caching with a single top-level `cache_control` field.
+- **Evidence to record:** hit rate, false-hit rate on the labelled pairs, latency on hit vs miss, and cost saved.
+
+### 12.4 Automated Eval Dataset Generator (component of P5)
+
+- **Card stack:** Python, Claude API, Pandas, Pydantic, DuckDB, Streamlit.
+- **Steps (paraphrased):** pull real prompts and responses from production logs; cluster them to surface the cases that matter; have an LLM draft expected outputs, then review them by hand; score each new model version against the set automatically; flag regressions before release.
+- **Notes:** you have no production logs, so use the traces from P1 and P2 as the log source. Keep the hand-review step. The note in the P1 plan (task 5) applies: generated cases tend to copy the source wording and flatter the system. Build the dataset from observed failures, as in Hamel Husain's error-analysis approach.
+- **Resources:** Hamel Husain's essay and email course, Anthropic's "Demystifying evals" (sections 2 and 7). Langfuse lists tracing, evals, prompt management and experiments (https://langfuse.com/); check its dataset features before choosing it over a plain script.
+
+### 12.5 LoRA Fine-Tuning Pipeline (variant of P3)
+
+- **Card stack:** Python, PyTorch, Hugging Face, PEFT, bitsandbytes, Weights & Biases.
+- **Steps (paraphrased):** build a clean instruction dataset for your domain; load the base model in 4-bit with bitsandbytes; attach LoRA adapters with PEFT and set rank and alpha; train while tracking loss and eval metrics in W&B; merge the adapters and benchmark against the base model.
+- **Notes:** this matches section 5. The "benchmark against the base model" step is the part that matters; run it on the same eval set as the prompting baseline. W&B is optional and was not researched. Confirm bitsandbytes works on your hardware before committing (not checked here).
+- **Resources:** section 5.
+
+### 12.6 Text-to-SQL with Guardrails (new P7, optional)
+
+- **Card stack:** Python, Claude API, SQLAlchemy, Postgres, sqlglot, Pydantic, FastAPI.
+- **Steps (paraphrased):** give the model the schema and the question; parse the generated SQL with sqlglot and block destructive statements; run it read-only against a sandboxed replica first; attach a confidence score and ask for confirmation on low-confidence queries; return the results together with the SQL so users can audit it.
+- **Notes and pushback:**
+  - Treat model-generated SQL as untrusted input. A parse-and-block step is one layer, not the boundary. The boundary is the database: a read-only role, a statement timeout, row limits, and row-level security where it applies.
+  - Validate the exact string you execute. If you normalise or strip comments after validating, you may run something different from what you checked.
+  - Self-reported confidence scores are only useful if you check them against measured accuracy on your own question set.
+  - Prove the guardrails: write adversarial prompts (drops, updates, multi-statement input, hidden columns) and show the database refuses writes even if the parser is bypassed.
+- **Resources:**
+  - OWASP Top 10 for LLM Applications 2025 (Secondary summary): lists Improper Output Handling (LLM05) and Excessive Agency (LLM06) among the risks. https://www.hackerone.com/ai/owasp-top-10-llms-2025 . The official OWASP GenAI Security Project page was not opened, and a 2026 edition may exist, so check it.
+  - sql-guardrail (Secondary, a third-party package, listed as an example of policy-based validation, not an endorsement): sqlglot-based checks, with advice to pair it with a read-only role, row-level security and a statement timeout. https://pypi.org/project/sql-guardrail/
+  - BIRD benchmark paper (Primary, research): defines execution accuracy (EX) and a valid efficiency score; use EX as the metric on your own question set. https://arxiv.org/pdf/2305.03111
+  - sqlglot docs: URL not verified in this research.
+- **Evidence to record:** execution accuracy on a 30 to 50 question set over a sample Postgres database; adversarial prompts blocked; false blocks; proof that a write attempt fails at the database level.
+
+---
+
+## 13. Verification notes for the 2026-11-17 additions
+
+- The card contents come from screenshots of a social post. I have not seen the full post or its caption, and the card-to-skill mapping is inferred.
+- That the post promotes a paid program is an impression from the screenshots, not verified.
+- The Pinecone, LangGraph, RedisVL and Anthropic prompt caching pages are official docs, and several are versioned or in alpha or beta, so re-check them before building. The LangGraph human-in-the-loop page seen in one search result carried a v1-alpha notice.
+- OWASP details come from a Secondary summary. The sql-guardrail and OWASP entries are for orientation only.
+- The BIRD paper is from 2023. I did not use its benchmark scores, which are stale.
+- Nothing here was tested hands-on.

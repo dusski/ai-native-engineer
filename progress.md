@@ -9,7 +9,7 @@ Resources for each project are in `ai-native-engineer-resources.md`. Step-by-ste
 
 **Status key:** Not started / In progress / Done
 
-**Planned order (suggestion, can change):** 1, 2, 5, 4, 3. Start the eval set during project 1.
+**Planned order (suggestion, can change):** 1, 2, 5, then optional 6 and 7, then 4, 3. Start the eval set during project 1. Projects 6 and 7 come from the second source post (resource map, section 11).
 
 ---
 
@@ -37,6 +37,7 @@ Checkpoints:
 - [ ] Agent completes a real multi-step task using those tools [demo or trace]
 - [ ] Tool errors and timeouts handled [test or trace showing recovery]
 - [ ] Short write-up of design choices [README link]
+- [ ] (Optional, from second post) Human approval step for a risky action, with step logs you can replay [trace]
 
 Repo / links: (none yet)
 Notes: (none yet)
@@ -50,6 +51,37 @@ Checkpoints:
 - [ ] Automated evals run from a command or CI [run output]
 - [ ] Accuracy, latency and cost tracked per run [table or dashboard]
 - [ ] At least one failure found through error analysis and fixed [before/after]
+- [ ] (From second post) Eval dataset built from real traces, expected outputs reviewed by hand [case count + how many edited]
+- [ ] (From second post) A new model or prompt version scored against the set, regressions flagged [run output]
+
+Repo / links: (none yet)
+Notes: (none yet)
+
+## Project 6: Semantic caching layer (optional, from second post)
+Status: Not started
+Task plan: not written yet
+
+Checkpoints:
+- [ ] Cache in front of the model: embed, look up, return on hit, store on miss [repo link]
+- [ ] Labelled set of paraphrase pairs and near-miss pairs [count + file location]
+- [ ] Similarity threshold chosen from measurements [hit rate and false-hit rate at 2+ thresholds]
+- [ ] Hit rate, latency (hit vs miss) and cost saved reported [numbers]
+- [ ] Cache scoped per user or tenant [test showing no cross-user hit]
+
+Repo / links: (none yet)
+Notes: (none yet)
+
+## Project 7: Text-to-SQL with guardrails (optional, from second post)
+Status: Not started
+Task plan: not written yet
+
+Checkpoints:
+- [ ] Question to SQL over a sample Postgres database [repo link]
+- [ ] Generated SQL parsed and destructive statements blocked [test output]
+- [ ] Execution accuracy measured on a 30 to 50 question set [score]
+- [ ] Adversarial prompts tried (writes, multi-statement, hidden columns) [blocked count, false blocks]
+- [ ] Writes fail at the database level (read-only role) even if the parser is bypassed [test output]
+- [ ] Results returned with the SQL shown [example output]
 
 Repo / links: (none yet)
 Notes: (none yet)
@@ -96,6 +128,7 @@ Notes: (none yet)
 
 ## Log (newest first)
 
+- 2026-11-17: Synced local files with the Claude Project export. Added the second source post to the resource map (sections 11 to 13), optional projects 6 (semantic caching) and 7 (text-to-SQL guardrails) and extra checkpoints for projects 2 and 5 to this tracker, and a new doc, `job-postings.md`. No local content was overwritten.
 - 2026-11-16: Project 1, task 1 in progress. uv project and deps committed; smoke test calls Claude successfully (stop_reason `end_turn`). Embedding check still missing. First run hit a 400 "credit balance too low" error before it passed.
 - 2026-11-16: Created the local repo `rag-hybrid-search` for Project 1 (inside `projects/`, not pushed to GitHub). No task done yet.
 - 2026-11-16: Workspace cleanup. Moved the Project 1 plan to `tasks/project-1-rag.md`, fixed paths in all files, rewrote `AGENTS.md`. No project work started yet.

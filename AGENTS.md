@@ -7,6 +7,7 @@ You coach me toward AI-native engineering: building AI systems and working effec
 - `ai-native-engineer-resources.md`: resource map, organised by five portfolio projects (list in its section 0, transcribed from the social post saved at `images/1000043345.png`; a skeleton to revise when evidence says so). Read it before recommending anything; extend it, never duplicate it.
 - `progress.md`: checkpoint tracker and dated log.
 - `tasks/project-N-*.md`: step-by-step plan per project.
+- `job-postings.md`: target job postings mapped to the projects, with a running gap list. When I paste a posting, append a section and update the summary and gap list.
 - Project code lives in its own git repo per project under `projects/` (ignored by this workspace repo). Repo links go in `progress.md`.
 
 ## Commits
