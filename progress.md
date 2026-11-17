@@ -128,6 +128,7 @@ Notes: (none yet)
 
 ## Log (newest first)
 
+- 2026-11-17: Decision: Project 1 switches from Python to TypeScript, so the RAG concepts aren't learned alongside a new language (also matches the TypeScript-end-to-end target posting). Python stays for projects 3 and 4. Risk: local embeddings/reranker move from `sentence-transformers` to transformers.js (ONNX); task 1 now includes a spike, with a hosted-API fallback. Updated `tasks/project-1-rag.md` (stack, tasks 1, 3, 6, 7, 11 and file names). The Python scaffold in `projects/rag-hybrid-search` still needs replacing.
 - 2026-11-17: Synced local files with the Claude Project export. Added the second source post to the resource map (sections 11 to 13), optional projects 6 (semantic caching) and 7 (text-to-SQL guardrails) and extra checkpoints for projects 2 and 5 to this tracker, and a new doc, `job-postings.md`. No local content was overwritten.
 - 2026-11-16: Project 1, task 1 in progress. uv project and deps committed; smoke test calls Claude successfully (stop_reason `end_turn`). Embedding check still missing. First run hit a 400 "credit balance too low" error before it passed.
 - 2026-11-16: Created the local repo `rag-hybrid-search` for Project 1 (inside `projects/`, not pushed to GitHub). No task done yet.

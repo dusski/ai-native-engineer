@@ -7,9 +7,9 @@
 - To update this file, tell Claude, for example: "Task 7 done, baseline Pass@10 = 0.78". One milestone updates three places together: the Result line here, `progress.md` (checkpoint + Status), and its log.
 
 **Stack (chosen for running locally, with minimal accounts)**
-- Language: Python 3.12+, managed with `uv`. Most AI tooling is Python-first, and projects 3 and 4 require it. Claude annotates the Python.
-- Embeddings and reranker: local open models via `sentence-transformers`. These run on CPU, need no API key, and cost nothing.
-- Keyword search: a small BM25 library or SQLite FTS5 (choose in task 9).
+- Language: TypeScript on Node (decision 2026-11-17: learn RAG concepts without learning Python at the same time). Python returns in projects 3 and 4, where it is required. The earlier Python scaffold (`uv`, `scripts/smoke_test.py`) is superseded.
+- Embeddings and reranker: local ONNX models via `@huggingface/transformers` (transformers.js). They run on CPU, need no API key, and cost nothing. Fallback if the task 1 spike fails: a hosted embedding/rerank API (small cost, extra account). Model availability and versions: unverified, check in the spike.
+- Keyword search: SQLite FTS5 via `better-sqlite3`, or a small npm BM25 library (choose in task 9).
 - Answer generation: Claude API (needs `ANTHROPIC_API_KEY`; cost should stay well under $5).
 - No framework (LangChain, LlamaIndex), no vector DB, no UI. You write each piece yourself so you understand it.
 
@@ -51,14 +51,14 @@
 
 ### 1. Set up the repo and environment — In progress
 **Description**
-Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), install `uv`, and create a Python project. Add `anthropic`, `sentence-transformers` and `numpy`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude and one test embedding.
-**Learn:** `uv` basics (project init, `uv add`, `uv run`). Treat it like npm + nvm for Python.
+Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), and create a TypeScript project (Node, `tsx`, `vitest`). Add `@anthropic-ai/sdk` and `@huggingface/transformers`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude, one test embedding, and one test rerank of a few query/chunk pairs (the spike: if the rerank doesn't work locally, decide on the hosted fallback now, not in task 11).
+**Learn:** how transformers.js loads and caches ONNX models.
 **Deliverables**
-- Repo with `pyproject.toml`, `.gitignore`, `.env.example`
-- `scripts/smoke_test.py`
-**Done when:** `uv run scripts/smoke_test.py` prints a short Claude reply and an embedding vector length.
+- Repo with `package.json`, `tsconfig.json`, `.gitignore`, `.env.example`
+- `scripts/smoke-test.ts`
+**Done when:** `npx tsx scripts/smoke-test.ts` prints a short Claude reply, an embedding vector length, and reranker scores for a few pairs.
 **Time:** ~1h
-**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Embedding half not written yet, so not Done.
+**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); the TS smoke test (Claude + embedding + rerank spike) is still to write, so not Done.
 
 ### 2. Choose and collect the document set — Not started
 **Description**
@@ -72,10 +72,10 @@ Choose 50–200 documents you know well, such as the docs of a framework you use
 
 ### 3. Load and chunk the documents — Not started
 **Description**
-Write `chunk.py`. Split each document into chunks of about 300–500 tokens with a small overlap. Prefer splitting on markdown headings or paragraphs over fixed character counts. Give each chunk a stable `id`, its `source` file and its `heading`. Save everything to `data/chunks.jsonl`.
+Write `chunk.ts`. Split each document into chunks of about 300–500 tokens with a small overlap. Prefer splitting on markdown headings or paragraphs over fixed character counts. Give each chunk a stable `id`, its `source` file and its `heading`. Save everything to `data/chunks.jsonl`.
 **Learn:** why chunk size matters. Chunks that are too small lose context, and chunks that are too big dilute the match.
 **Deliverables**
-- `chunk.py`
+- `chunk.ts`
 - `data/chunks.jsonl`
 **Done when:** you open 5 random chunks and each one reads as a self-contained piece of text. Record the chunk count.
 **Time:** ~2h
@@ -106,21 +106,21 @@ Add 20 or more questions. You can have Claude generate candidate questions from 
 
 ### 6. Embed all chunks and cache them — Not started
 **Description**
-Embed every chunk with a small local embedding model and save the vectors to disk, so you embed once and reuse. Pick a model from the sentence-transformers / MTEB leaderboard and check its model card for the max input length.
+Embed every chunk with a small local embedding model and save the vectors to disk, so you embed once and reuse. Pick a model from the MTEB leaderboard that has an ONNX build usable in transformers.js, and check its model card for the max input length.
 **Learn:** what an embedding is, and why cosine similarity is used to compare them.
 **Deliverables**
-- `embed.py`
-- `data/embeddings.npy` (vectors) plus ids in the same order
+- `embed.ts`
+- `data/embeddings.bin` (vectors as raw `Float32Array`) plus ids in the same order
 **Done when:** the vector count equals the chunk count, and a second run loads from cache instantly.
 **Time:** ~1–2h
 **Result:**
 
 ### 7. Vector search + Pass@k eval script → baseline number — Not started
 **Description**
-Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k chunk ids by cosine similarity (numpy dot product on normalized vectors). Write `eval_retrieval.py`, which runs every eval question and prints Pass@5 and Pass@10. Pass@k means "was a gold chunk in the top k?"
+Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k chunk ids by cosine similarity (dot product over `Float32Array`s of normalized vectors). Write `eval-retrieval.ts`, which runs every eval question and prints Pass@5 and Pass@10. Pass@k means "was a gold chunk in the top k?"
 **Deliverables**
-- `retrieve.py` with `retrieve_vector`
-- `eval_retrieval.py` that prints a results line
+- `retrieve.ts` with `retrieve_vector`
+- `eval-retrieval.ts` that prints a results line
 - `results.md` table with its first row: `vector | Pass@5 | Pass@10`
 **Done when:** the baseline numbers are recorded. **This is the most important number in the project.** Every later task is compared against it.
 **Time:** ~2h
@@ -128,9 +128,9 @@ Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k 
 
 ### 8. Generate answers end to end — Not started
 **Description**
-Write `ask.py "question"`. It retrieves the top 5 chunks, puts them in a prompt, and asks Claude to answer *only* from them, or to say "I don't know". Use a current small model; check the Claude models page for the ID.
+Write `ask.ts "question"`. It retrieves the top 5 chunks, puts them in a prompt, and asks Claude to answer *only* from them, or to say "I don't know". Use a current small model; check the Claude models page for the ID.
 **Deliverables**
-- `ask.py` (CLI)
+- `ask.ts` (CLI)
 - 3 example question/answer outputs pasted into `results.md`
 **Done when:** you get good answers to known questions, and "I don't know" for a question the docs don't cover.
 **Time:** ~1–2h
@@ -143,7 +143,7 @@ Write `ask.py "question"`. It retrieves the top 5 chunks, puts them in a prompt,
 Add `retrieve_bm25(query, k)` using a BM25 library or SQLite FTS5. Run the same eval. Compare which questions vector search gets right and BM25 misses, and the reverse.
 **Learn:** what BM25 scores and why it wins on exact terms (names, codes) where embeddings struggle.
 **Deliverables**
-- `retrieve_bm25` in `retrieve.py`
+- `retrieve_bm25` in `retrieve.ts`
 - New row in `results.md`
 **Done when:** BM25 Pass@k is recorded, and you can name 2 questions where BM25 beats vector search (or say that none exist).
 **Time:** ~1–2h
@@ -153,7 +153,7 @@ Add `retrieve_bm25(query, k)` using a BM25 library or SQLite FTS5. Run the same 
 **Description**
 Add `retrieve_hybrid`. Take the top 50 from each retriever and merge them with Reciprocal Rank Fusion. Use `k=60`, the standard default; don't tune it yet.
 **Deliverables**
-- `rrf()` and `retrieve_hybrid` in `retrieve.py`
+- `rrf()` and `retrieve_hybrid` in `retrieve.ts`
 - New row in `results.md`
 **Done when:** the hybrid Pass@k is recorded next to vector and BM25.
 **Time:** ~1h
@@ -161,9 +161,9 @@ Add `retrieve_hybrid`. Take the top 50 from each retriever and merge them with R
 
 ### 11. Add a reranker — Not started
 **Description**
-Pass hybrid's top ~50 through a local cross-encoder reranker and keep the top 10. Unlike embeddings, a cross-encoder reads the query and the chunk together, so it is slower but more accurate. Measure the time per query.
+Pass hybrid's top ~50 through a local cross-encoder reranker (transformers.js, or the hosted fallback chosen in task 1) and keep the top 10. Unlike embeddings, a cross-encoder reads the query and the chunk together, so it is slower but more accurate. Measure the time per query.
 **Deliverables**
-- `retrieve_reranked` in `retrieve.py`
+- `retrieve_reranked` in `retrieve.ts`
 - New row in `results.md`, with an added latency column (ms/query)
 **Done when:** the reranked Pass@k and latency are recorded. Write down whether the accuracy gain is worth the latency.
 **Time:** ~2h
@@ -173,9 +173,9 @@ Pass hybrid's top ~50 through a local cross-encoder reranker and keep the top 10
 
 ### 12. Citations, validated in code — Not started
 **Description**
-Switch `ask.py` to the best retriever. Label chunks `[1]…[n]` in the prompt and require a citation after every claim. After the answer comes back, parse the cited numbers in code, check that each one was actually provided, and print the source file next to it. Then run all eval questions and count valid citations.
+Switch `ask.ts` to the best retriever. Label chunks `[1]…[n]` in the prompt and require a citation after every claim. After the answer comes back, parse the cited numbers in code, check that each one was actually provided, and print the source file next to it. Then run all eval questions and count valid citations.
 **Deliverables**
-- Updated `ask.py` that prints the answer with sources
+- Updated `ask.ts` that prints the answer with sources
 - `% answers with valid citations` in `results.md`
 **Done when:** an example cited answer is in `results.md`, and the invalid-citation rate is measured.
 **Time:** ~2–3h
@@ -198,7 +198,7 @@ List every eval question the best retriever still misses. Read each one and labe
 For each chunk, have Claude write 1–2 sentences that place the chunk within its document. Prepend them to the chunk, then re-embed and re-index. Use prompt caching so the full document isn't paid for on every call. Compare against task 11.
 **Learn:** Anthropic Contextual Retrieval post and cookbook (resource map, section 3).
 **Deliverables**
-- `contextualize.py`
+- `contextualize.ts`
 - New rows in `results.md`, plus the one-time cost in dollars
 **Done when:** it is measured on your data, with a verdict on whether it was worth the cost.
 **Time:** ~2–3h
@@ -210,13 +210,13 @@ Write the README a hiring manager would read: what the project does, the archite
 **Deliverables**
 - `README.md`
 - Repo link added to `progress.md`
-**Done when:** a stranger could clone the repo and run `ask.py` by following the README.
+**Done when:** a stranger could clone the repo and run `ask.ts` by following the README.
 **Time:** ~1–2h
 **Result:**
 
 ### 16. (Optional) Deploy a live demo — Not started
 **Description**
-The source post stresses deploying projects, not just running them locally. Make `ask.py` reachable without cloning the repo: a small hosted endpoint, or a hosted page that takes a question and shows the cited answer. Keep it minimal and protect your API key (rate limit, spend cap). If hosting costs or key exposure outweigh the value, a recorded terminal session in the README is an acceptable substitute.
+The source post stresses deploying projects, not just running them locally. Make `ask.ts` reachable without cloning the repo: a small hosted endpoint, or a hosted page that takes a question and shows the cited answer. Keep it minimal and protect your API key (rate limit, spend cap). If hosting costs or key exposure outweigh the value, a recorded terminal session in the README is an acceptable substitute.
 **Deliverables**
 - A demo link (or recording) in the README
 - One line on hosting cost and how the key is protected
