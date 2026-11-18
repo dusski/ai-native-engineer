@@ -1,8 +1,10 @@
 # Becoming a 10x AI-Native Engineer: Resource Map
 
-Compiled 2026-11-15. Purpose: learning resources for becoming an AI engineer and working effectively with AI. Organised around five portfolio projects transcribed from a "5 REAL projects" TikTok post by algorithmswithpeter (screenshot: `images/1000043345.png`). The post's own advice: deploy the projects, measure results, showcase them on GitHub. Treat the project list as a skeleton.
+Compiled 2026-11-15. Purpose: learning resources for becoming an AI engineer and working effectively with AI. Organised around five portfolio projects transcribed from a "5 REAL projects" TikTok post by algorithmswithpeter (screenshot: `images/5_real_projects_for_AI_engineers.png`). The post's own advice: deploy the projects, measure results, showcase them on GitHub. Treat the project list as a skeleton.
 
 **Updated 2026-11-17:** added a second source post (six project cards by bashi_fuirkashi, "one skill = one project"). Nothing above or below was removed. New material is in sections 11 to 13, plus two rows in the section 0 table and one line in the project order.
+
+**Updated 2026-11-19:** added a third source, three PDF project guides (section 14; full extract in `references/guides-extract.md`). They add checkpoints, not projects.
 
 **Source trust labels**
 - **Primary** = official docs, vendor engineering blogs, original authors, publishers.
@@ -144,7 +146,7 @@ Read roughly in this order:
 
 ## 11. Second post (added 2026-11-17): "one skill = one project"
 
-**Source:** a post by bashi_fuirkashi, "One Skill = One Project", shown as six project cards in screenshots. The six screenshots are saved as `images/Screenshot_20261117-182747.png` to `images/Screenshot_20261117-182831.png`; this section is the text record. The post appears to promote a paid accelerator program; I noted that when transcribing and did not check the program or its terms. Which skill each card belongs to (RAG, evals, fine-tuning, guardrails and so on) is inferred from the card titles, and any partly obscured text is a best reading. Treat the cards as project ideas, not a curriculum. The stacks are the poster's choices, not requirements. The card steps below are paraphrased.
+**Source:** a post by bashi_fuirkashi, "One Skill = One Project", shown as six project cards in screenshots. The six screenshots are saved as `images/six_ai_skills_projects_1.png` to `images/six_ai_skills_projects_6.png`; this section is the text record. The post appears to promote a paid accelerator program; I noted that when transcribing and did not check the program or its terms. Which skill each card belongs to (RAG, evals, fine-tuning, guardrails and so on) is inferred from the card titles, and any partly obscured text is a best reading. Treat the cards as project ideas, not a curriculum. The stacks are the poster's choices, not requirements. The card steps below are paraphrased.
 
 ### 11.1 How the six cards map onto the existing plan
 
@@ -161,11 +163,11 @@ The first post's "self-host with vLLM" (P4) is not in the second post. Combined,
 
 ### 11.2 Recommended way to include them (opinion)
 
-- **Keep the numbering P1 to P5.** `progress.md`, `tasks/` and `job-postings.md` all refer to those numbers.
+- **Keep the numbering P1 to P5.** `progress.md`, `tasks/` and `resources/job-postings.md` (not tracked) all refer to those numbers.
 - **Add P6 and P7 as optional extensions**, and record the other four cards as variants inside P1, P2, P3 and P5 rather than as new projects. Doing both versions of one skill adds little.
 - **Suggested order:** 1, 2, 5, then 6, then 7, then 4, then 3. P6 needs P5's eval and cost tracking to catch wrong cache hits and prove savings. P7 needs the error-analysis habit from P1 and P5.
-- **Fit with the Ruby Labs posting** (`job-postings.md`): P6 helps with the listed gap "PostgreSQL and caching (Redis, KV)" and with cost control. P7 helps with Postgres and with fallback flows for bad model output. Neither replaces the posting's production-experience requirement. The posting is TypeScript end to end, and the cards are Python. Language is your choice, so P6 could be built in TypeScript.
-- **Order of the task plans:** `tasks/` currently holds P1 only. Add task plans for P2, P5, P6 and P7 one at a time, in the same format.
+- **Fit with the target posting** (`resources/job-postings.md`, not tracked): P6 helps with the listed gap "PostgreSQL and caching (Redis, KV)" and with cost control. P7 helps with Postgres and with fallback flows for bad model output. Neither replaces the posting's production-experience requirement. The posting is TypeScript end to end, and the cards are Python. Language is your choice, so P6 could be built in TypeScript.
+- **Order of the task plans:** `tasks/` holds P1, P2 and P5 (P2 and P5 added 2026-11-19). Add P6 and P7 one at a time, in the same format.
 
 ---
 
@@ -249,3 +251,20 @@ The first post's "self-host with vLLM" (P4) is not in the second post. Combined,
 - OWASP details come from a Secondary summary. The sql-guardrail and OWASP entries are for orientation only.
 - The BIRD paper is from 2023. I did not use its benchmark scores, which are stale.
 - Nothing here was tested hands-on.
+
+---
+
+## 14. Third source (added 2026-11-19): three PDF project guides
+
+**Source:** three PDF guides of AI-engineering project specs (a 9-page short guide, a 21-page six-project guide, a 50-page 15-project guide), kept outside this repo. All three promote one paid online community; no citations or code, and every number in them is illustrative. The full extract, the sorting of their 27 projects and the reasoning is in `references/guides-extract.md`.
+
+**What was taken (applied 2026-11-19):**
+- Three additions, as checkpoints inside existing projects: **gateway-lite** (P2), **attack your own agent** (P2), **judge calibration** (P5). Task plans: `tasks/project-2-agent-mcp.md`, `tasks/project-5-evals.md`.
+- Borrowed checkpoints for every project: MRR and per-category Pass@k and a citation-support check in P1; budget ceiling and structured tool status in P2; a CI gate with flip lists and an error-analysis-to-dataset loop in P5; threshold curves and cache-key invalidation in P6; ambiguous and unanswerable questions in P7; held-out sets and break-even numbers in P3 and P4. See `progress.md`.
+- Shared advice worth keeping: a project counts only with an eval, a number and a defensible tradeoff; build the eval before the feature; the README opens with the result.
+
+**Tools named in the extract** (Secondary unless marked, accessed 2026-11-18):
+- garak (NVIDIA, generic LLM vulnerability probes; v0.17.1 reported 2026-10-16) and PyRIT (Microsoft, multi-turn attacks; repo `microsoft/PyRIT`). Both Python. Use only against your own systems. Optional for P2 task 11.
+- DeepEval: reported at v4.3.1 (2026-10-16). Python. **Ragas** (section 3) is reported to have had no commits since 2026-02-24; not confirmed on GitHub, so check before adopting it.
+- vLLM LoRA serving, `--enable-lora` (Primary): https://docs.vllm.ai/en/v0.14.0/features/lora/ (for P3 on P4).
+- **Caution:** LiteLLM 1.82.7 and 1.82.8 (2026-03-24) were malicious releases; 1.83.0 is reported clean. Pin and hash-verify if a Python project uses it.

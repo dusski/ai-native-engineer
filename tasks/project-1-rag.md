@@ -88,7 +88,7 @@ Write `chunk.ts`. Split each document into chunks of about 300–500 tokens with
 Write 20 realistic questions a user would ask. For each, record the chunk id(s) that contain the answer and a one-line expected answer. Mix easy lookups, questions phrased differently from the docs, and exact-term questions (names, error codes, flags).
 **Learn:** Hamel Husain, "Your AI Product Needs Evals" (link in the resource map, section 7).
 **Deliverables**
-- `data/eval.json` as a list of entries shaped like `{question, gold_ids, expected_answer}`
+- `data/eval.json` as a list of entries shaped like `{question, gold_ids, expected_answer, category}`, where `category` is `lookup`, `paraphrase` or `exact-term` (task 7 reports Pass@k per category)
 **Done when:** 20 entries, and every `gold_id` exists in `chunks.jsonl`. Write a tiny check script for this.
 **Time:** ~2h
 **Result:**
@@ -117,11 +117,11 @@ Embed every chunk with a small local embedding model and save the vectors to dis
 
 ### 7. Vector search + Pass@k eval script → baseline number — Not started
 **Description**
-Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k chunk ids by cosine similarity (dot product over `Float32Array`s of normalized vectors). Write `eval-retrieval.ts`, which runs every eval question and prints Pass@5 and Pass@10. Pass@k means "was a gold chunk in the top k?"
+Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k chunk ids by cosine similarity (dot product over `Float32Array`s of normalized vectors). Write `eval-retrieval.ts`, which runs every eval question and prints Pass@5, Pass@10 and MRR, overall and per question category. Pass@k means "was a gold chunk in the top k?" MRR (mean reciprocal rank) averages 1/rank of the first gold chunk, so it also rewards ranking it higher. Use nDCG only if questions have several gold chunks.
 **Deliverables**
 - `retrieve.ts` with `retrieve_vector`
 - `eval-retrieval.ts` that prints a results line
-- `results.md` table with its first row: `vector | Pass@5 | Pass@10`
+- `results.md` with two separate tables: retrieval (`method | Pass@5 | Pass@10 | MRR`, plus Pass@10 per category) and, from task 8 on, answer quality (citations, support). Don't mix the two kinds of metric in one table.
 **Done when:** the baseline numbers are recorded. **This is the most important number in the project.** Every later task is compared against it.
 **Time:** ~2h
 **Result:**
@@ -173,12 +173,12 @@ Pass hybrid's top ~50 through a local cross-encoder reranker (transformers.js, o
 
 ### 12. Citations, validated in code — Not started
 **Description**
-Switch `ask.ts` to the best retriever. Label chunks `[1]…[n]` in the prompt and require a citation after every claim. After the answer comes back, parse the cited numbers in code, check that each one was actually provided, and print the source file next to it. Then run all eval questions and count valid citations.
+Switch `ask.ts` to the best retriever. Label chunks `[1]…[n]` in the prompt and require a citation after every claim. After the answer comes back, parse the cited numbers in code, check that each one was actually provided, and print the source file next to it. Then run all eval questions and count valid citations. A valid citation number doesn't mean the chunk supports the claim, so hand-check 20 answers: for each cited claim, does the cited chunk actually say it? (P5's calibrated judge can automate this later.)
 **Deliverables**
 - Updated `ask.ts` that prints the answer with sources
-- `% answers with valid citations` in `results.md`
-**Done when:** an example cited answer is in `results.md`, and the invalid-citation rate is measured.
-**Time:** ~2–3h
+- `% answers with valid citations` and `% of 20 hand-checked answers where citations support the claims` in the answer-quality table of `results.md`
+**Done when:** an example cited answer is in `results.md`, and both the invalid-citation rate and the support rate are measured.
+**Time:** ~3–4h
 **Result:**
 
 ### 13. Error analysis: read the failures — Not started
