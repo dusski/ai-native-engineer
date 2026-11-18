@@ -26,7 +26,7 @@ Checkpoints (evidence in brackets):
 - [ ] Short write-up with before/after numbers [README link]
 
 Repo / links: `projects/rag-hybrid-search` (own git repo, local only, not pushed). `main` = TypeScript; branch `python-version` keeps the earlier Python work.
-Notes: Task 1 in progress: TS scaffold and Claude smoke test done; embedding + rerank spike still to do.
+Notes: Task 1 done (2026-11-18): Claude, local embedding and local rerank all work in `scripts/smoke-test.ts`. Next: task 2, choose the document set.
 
 ## Project 2: Agent + MCP server
 Status: Not started
@@ -128,6 +128,7 @@ Notes: (none yet)
 
 ## Log (newest first)
 
+- 2026-11-18: Project 1, task 1 done. Local embedding (`all-MiniLM-L6-v2-ONNX`, 384 dims, normalized, ~10–15 ms per embed) and local rerank spike passed (`Xenova/bge-reranker-base`, q8, 266 MB): relevant 7.18 vs non-answers 0.25 and 0.39, 3 pairs in ~124–141 ms, cached load ~700 ms. No hosted fallback needed. Findings: the transformers.js `text-classification` pipeline can't score pairs (use tokenizer `text_pair` + `AutoModelForSequenceClassification`), and Node defaults to fp32 unless `dtype: "q8"` is set. One run gave different scores (6.88 / -0.26 / -10.18), cause not confirmed.
 - 2026-11-17: Project 1 repo re-initialised as TypeScript. Old Python work (3 commits) kept on branch `python-version`; `main` reset to the initial commit plus `46e7e2e` "Initialize TypeScript project with dependencies" (npm, tsconfig, `@anthropic-ai/sdk`, `@huggingface/transformers`, `dotenv`, `tsx`, `vitest`). `scripts/smoke-test.ts` ported from the Python version: typecheck clean, Claude reply printed, stop_reason `end_turn`. Not yet done: embedding and rerank spike. Watch item: npm skipped install scripts for `protobufjs` and `fsevents`; check this first if the ONNX runtime fails to load.
 - 2026-11-17: Decision: Project 1 switches from Python to TypeScript, so the RAG concepts aren't learned alongside a new language (also matches the TypeScript-end-to-end target posting). Python stays for projects 3 and 4. Risk: local embeddings/reranker move from `sentence-transformers` to transformers.js (ONNX); task 1 now includes a spike, with a hosted-API fallback. Updated `tasks/project-1-rag.md` (stack, tasks 1, 3, 6, 7, 11 and file names). The Python scaffold in `projects/rag-hybrid-search` still needs replacing.
 - 2026-11-17: Synced local files with the Claude Project export. Added the second source post to the resource map (sections 11 to 13), optional projects 6 (semantic caching) and 7 (text-to-SQL guardrails) and extra checkpoints for projects 2 and 5 to this tracker, and a new doc, `job-postings.md`. No local content was overwritten.

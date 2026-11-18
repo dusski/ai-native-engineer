@@ -18,7 +18,7 @@
 ## TOC
 
 **Phase A: Setup and data**
-1. [ ] Set up the repo and environment
+1. [x] Set up the repo and environment
 2. [ ] Choose and collect the document set
 3. [ ] Load and chunk the documents
 
@@ -49,7 +49,7 @@
 
 ## Phase A: Setup and data
 
-### 1. Set up the repo and environment — In progress
+### 1. Set up the repo and environment — Done
 **Description**
 Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), and create a TypeScript project (Node, `tsx`, `vitest`). Add `@anthropic-ai/sdk` and `@huggingface/transformers`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude, one test embedding, and one test rerank of a few query/chunk pairs (the spike: if the rerank doesn't work locally, decide on the hosted fallback now, not in task 11).
 **Learn:** how transformers.js loads and caches ONNX models.
@@ -58,7 +58,7 @@ Create a git repo for this project (its own repo inside `projects/`, which this 
 - `scripts/smoke-test.ts`
 **Done when:** `npx tsx scripts/smoke-test.ts` prints a short Claude reply, an embedding vector length, and reranker scores for a few pairs.
 **Time:** ~1h
-**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); 2026-11-17: repo re-initialised as TypeScript on `main` (Python kept on branch `python-version`). `scripts/smoke-test.ts` Claude half works (typecheck clean, reply printed, stop_reason `end_turn`). Embedding and rerank spike still to do, so not Done.
+**Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); 2026-11-17: repo re-initialised as TypeScript on `main` (Python kept on branch `python-version`). `scripts/smoke-test.ts` Claude half works (typecheck clean, reply printed, stop_reason `end_turn`). 2026-11-18: Done. Embedding: `onnx-community/all-MiniLM-L6-v2-ONNX`, length 384, sum of squares 1.0000001 (normalized), cached load ~130–200 ms, one embed ~10–15 ms. Rerank spike passed locally, so no hosted fallback: `Xenova/bge-reranker-base` with `dtype: "q8"` (`model_quantized.onnx`, 266 MB; without it Node defaults to fp32, the 1.1 GB file). The `text-classification` pipeline can't take pairs and would softmax a single logit to 1.0, so it uses `AutoTokenizer` (`text_pair`) + `AutoModelForSequenceClassification` with raw logits. Cached load ~690–765 ms; 3 pairs (186 tokens padded) score in ~124–141 ms. Logits: relevant 7.18, plausible-but-wrong 0.25, near-topic non-answer 0.39 (the two non-answers score about equal and far below the relevant one). One run gave 6.88 / -0.26 / -10.18; cause not confirmed.
 
 ### 2. Choose and collect the document set — Not started
 **Description**
