@@ -19,7 +19,7 @@
 
 **Phase A: Setup and data**
 1. [x] Set up the repo and environment
-2. [ ] Choose and collect the document set
+2. [x] Choose and collect the document set
 3. [ ] Load and chunk the documents
 
 **Phase B: Measuring before building**
@@ -60,7 +60,7 @@ Create a git repo for this project (its own repo inside `projects/`, which this 
 **Time:** ~1h
 **Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); 2026-11-17: repo re-initialised as TypeScript on `main` (Python kept on branch `python-version`). `scripts/smoke-test.ts` Claude half works (typecheck clean, reply printed, stop_reason `end_turn`). 2026-11-18: Done. Embedding: `onnx-community/all-MiniLM-L6-v2-ONNX`, length 384, sum of squares 1.0000001 (normalized), cached load ~130–200 ms, one embed ~10–15 ms. Rerank spike passed locally, so no hosted fallback: `Xenova/bge-reranker-base` with `dtype: "q8"` (`model_quantized.onnx`, 266 MB; without it Node defaults to fp32, the 1.1 GB file). The `text-classification` pipeline can't take pairs and would softmax a single logit to 1.0, so it uses `AutoTokenizer` (`text_pair`) + `AutoModelForSequenceClassification` with raw logits. Cached load ~690–765 ms; 3 pairs (186 tokens padded) score in ~124–141 ms. Logits: relevant 7.18, plausible-but-wrong 0.25, near-topic non-answer 0.39 (the two non-answers score about equal and far below the relevant one). One run gave 6.88 / -0.26 / -10.18 with a truly unrelated third chunk (CSS Grid): the reranker pushed it far below both fetch-related chunks.
 
-### 2. Choose and collect the document set — Not started
+### 2. Choose and collect the document set — Done
 **Description**
 Choose 50–200 documents you know well, such as the docs of a framework you use daily. Markdown sources from a GitHub repo are best because they are already clean text. Save them under `data/raw/`. Knowing the content well lets you judge answers instantly.
 **Deliverables**
@@ -68,7 +68,7 @@ Choose 50–200 documents you know well, such as the docs of a framework you use
 - One paragraph in the README: what the corpus is, how many documents, and why you chose it
 **Done when:** the files are in the repo and you can name 5 questions you'd ask about them.
 **Time:** ~1h
-**Result:**
+**Result:** 2026-11-22: Done. Corpus: Angular docs from `angular/angular` `adev/src/content/` at commit `8b15295` (2026-11-20): `guide/forms` (22 files, incl. 16 Signal Forms guides) + `reference/errors` (69 files) = 91 Markdown files in `data/raw/`, MIT `LICENSE` copied alongside; README has the corpus paragraph and attribution (project commits `3fc4ffe`, `78e91a6`, `629455a`). First copy nested the error pages one level too deep (`errors/errors/`), fixed in `78e91a6`. Done check, 8 questions with their source files: (1) What causes NG0100 and how do I fix it? `NG0100.md`; (2) What does NG0203 mean, and where am I allowed to call `inject()`? `NG0203.md`; (3) My custom input component throws an error that no value accessor exists when I bind a form control to it. What am I missing? `NG01203.md`; (4) Two of my services depend on each other and the app fails on startup. How do I resolve it? `NG0200.md`; (5) How do I check that two password fields match? `form-validation.md` + `signals/cross-field-logic.md`; (6) How can I stop my "is this username taken?" server check from running on every keystroke? `form-validation.md`; (7) How do I make a `FormControl` reset to its initial value instead of `null`? `typed-forms.md`; (8) What is the default value of `updateOn` for a form control? `form-validation.md`. Open for task 4: classic and Signal Forms guides can both answer some questions (e.g. 5), so decide whether a question accepts either source.
 
 ### 3. Load and chunk the documents — Not started
 **Description**
