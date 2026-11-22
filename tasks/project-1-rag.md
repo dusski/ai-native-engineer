@@ -3,8 +3,7 @@
 **How to use this file**
 - Do one task at a time, top to bottom. Each task should take 1–3 hours.
 - A task is Done only when its "Done when" check passes. Record the evidence (numbers, file paths) in the task's Result line.
-- Status values: Not started / In progress / Done / Skipped.
-- To update this file, tell Claude, for example: "Task 7 done, baseline Pass@10 = 0.78". One milestone updates three places together: the Result line here, `progress.md` (checkpoint + Status), and its log.
+- To update this file, tell Claude, for example: "Task 7 done, baseline Pass@10 = 0.78". Task state lives only here: tick the TOC box and fill the Result line. Items to raise at a later task go in that task's `Open:` line and are deleted when resolved. `progress.md` changes only when a checkpoint or the project Status changes.
 
 **Stack (chosen for running locally, with minimal accounts)**
 - Language: TypeScript on Node (decision 2026-11-17: learn RAG concepts without learning Python at the same time). Python returns in projects 3 and 4, where it is required. The earlier Python scaffold (`uv`, `scripts/smoke_test.py`) is superseded.
@@ -49,7 +48,7 @@
 
 ## Phase A: Setup and data
 
-### 1. Set up the repo and environment — Done
+### 1. Set up the repo and environment
 **Description**
 Create a git repo for this project (its own repo inside `projects/`, which this workspace ignores, for example `projects/rag-hybrid-search`; link it in `progress.md`), and create a TypeScript project (Node, `tsx`, `vitest`). Add `@anthropic-ai/sdk` and `@huggingface/transformers`. Put the API key in a `.env` that is excluded by `.gitignore`. Make one test call to Claude, one test embedding, and one test rerank of a few query/chunk pairs (the spike: if the rerank doesn't work locally, decide on the hosted fallback now, not in task 11).
 **Learn:** how transformers.js loads and caches ONNX models.
@@ -60,7 +59,7 @@ Create a git repo for this project (its own repo inside `projects/`, which this 
 **Time:** ~1h
 **Result:** 2026-11-16: repo + uv project + deps committed. `scripts/smoke_test.py` Claude half works (reply printed, stop_reason `end_turn`; first run failed with a 400 "credit balance too low", second run passed). Python scaffold superseded by the TypeScript decision (2026-11-17); 2026-11-17: repo re-initialised as TypeScript on `main` (Python kept on branch `python-version`). `scripts/smoke-test.ts` Claude half works (typecheck clean, reply printed, stop_reason `end_turn`). 2026-11-18: Done. Embedding: `onnx-community/all-MiniLM-L6-v2-ONNX`, length 384, sum of squares 1.0000001 (normalized), cached load ~130–200 ms, one embed ~10–15 ms. Rerank spike passed locally, so no hosted fallback: `Xenova/bge-reranker-base` with `dtype: "q8"` (`model_quantized.onnx`, 266 MB; without it Node defaults to fp32, the 1.1 GB file). The `text-classification` pipeline can't take pairs and would softmax a single logit to 1.0, so it uses `AutoTokenizer` (`text_pair`) + `AutoModelForSequenceClassification` with raw logits. Cached load ~690–765 ms; 3 pairs (186 tokens padded) score in ~124–141 ms. Logits: relevant 7.18, plausible-but-wrong 0.25, near-topic non-answer 0.39 (the two non-answers score about equal and far below the relevant one). One run gave 6.88 / -0.26 / -10.18 with a truly unrelated third chunk (CSS Grid): the reranker pushed it far below both fetch-related chunks.
 
-### 2. Choose and collect the document set — Done
+### 2. Choose and collect the document set
 **Description**
 Choose 50–200 documents you know well, such as the docs of a framework you use daily. Markdown sources from a GitHub repo are best because they are already clean text. Save them under `data/raw/`. Knowing the content well lets you judge answers instantly.
 **Deliverables**
@@ -68,9 +67,9 @@ Choose 50–200 documents you know well, such as the docs of a framework you use
 - One paragraph in the README: what the corpus is, how many documents, and why you chose it
 **Done when:** the files are in the repo and you can name 5 questions you'd ask about them.
 **Time:** ~1h
-**Result:** 2026-11-22: Done. Corpus: Angular docs from `angular/angular` `adev/src/content/` at commit `8b15295` (2026-11-20): `guide/forms` (22 files, incl. 16 Signal Forms guides) + `reference/errors` (69 files) = 91 Markdown files in `data/raw/`, MIT `LICENSE` copied alongside; README has the corpus paragraph and attribution (project commits `3fc4ffe`, `78e91a6`, `629455a`). First copy nested the error pages one level too deep (`errors/errors/`), fixed in `78e91a6`. Done check, 8 questions with their source files: (1) What causes NG0100 and how do I fix it? `NG0100.md`; (2) What does NG0203 mean, and where am I allowed to call `inject()`? `NG0203.md`; (3) My custom input component throws an error that no value accessor exists when I bind a form control to it. What am I missing? `NG01203.md`; (4) Two of my services depend on each other and the app fails on startup. How do I resolve it? `NG0200.md`; (5) How do I check that two password fields match? `form-validation.md` + `signals/cross-field-logic.md`; (6) How can I stop my "is this username taken?" server check from running on every keystroke? `form-validation.md`; (7) How do I make a `FormControl` reset to its initial value instead of `null`? `typed-forms.md`; (8) What is the default value of `updateOn` for a form control? `form-validation.md`. Open for task 4: classic and Signal Forms guides can both answer some questions (e.g. 5), so decide whether a question accepts either source.
+**Result:** 2026-11-22: Done. Corpus: Angular docs from `angular/angular` `adev/src/content/` at commit `8b15295` (2026-11-20): `guide/forms` (22 files, incl. 16 Signal Forms guides) + `reference/errors` (69 files) = 91 Markdown files in `data/raw/`, MIT `LICENSE` copied alongside; README has the corpus paragraph and attribution (project commits `3fc4ffe`, `78e91a6`, `629455a`). First copy nested the error pages one level too deep (`errors/errors/`), fixed in `78e91a6`. Done check, 8 questions with their source files: (1) What causes NG0100 and how do I fix it? `NG0100.md`; (2) What does NG0203 mean, and where am I allowed to call `inject()`? `NG0203.md`; (3) My custom input component throws an error that no value accessor exists when I bind a form control to it. What am I missing? `NG01203.md`; (4) Two of my services depend on each other and the app fails on startup. How do I resolve it? `NG0200.md`; (5) How do I check that two password fields match? `form-validation.md` + `signals/cross-field-logic.md`; (6) How can I stop my "is this username taken?" server check from running on every keystroke? `form-validation.md`; (7) How do I make a `FormControl` reset to its initial value instead of `null`? `typed-forms.md`; (8) What is the default value of `updateOn` for a form control? `form-validation.md`.
 
-### 3. Load and chunk the documents — Not started
+### 3. Load and chunk the documents
 **Description**
 Write `chunk.ts`. Split each document into chunks of about 300–500 tokens with a small overlap. Prefer splitting on markdown headings or paragraphs over fixed character counts. Give each chunk a stable `id`, its `source` file and its `heading`. Save everything to `data/chunks.jsonl`.
 **Learn:** why chunk size matters. Chunks that are too small lose context, and chunks that are too big dilute the match.
@@ -79,11 +78,15 @@ Write `chunk.ts`. Split each document into chunks of about 300–500 tokens with
 - `data/chunks.jsonl`
 **Done when:** you open 5 random chunks and each one reads as a self-contained piece of text. Record the chunk count.
 **Time:** ~2h
+**Open:**
+- Restructure from the flat `scripts/smoke-test.ts` into real modules, starting with the chunker.
+- angular.dev Markdown has custom syntax (`<docs-video>`, `<docs-code>`, `NOTE:`/`TIP:`/`CRITICAL:` callouts) plus code blocks and tables. Read 3–4 files in `data/raw/` and decide what to strip and what to keep.
+- transformers.js caches models in `node_modules/@huggingface/transformers/.cache` (the reranker is 266 MB), so a clean install re-downloads them. Point `env.cacheDir` at a gitignored project folder.
 **Result:**
 
 ## Phase B: Measuring before building
 
-### 4. Write the hand-made eval set (20 questions) — Not started
+### 4. Write the hand-made eval set (20 questions)
 **Description**
 Write 20 realistic questions a user would ask. For each, record the chunk id(s) that contain the answer and a one-line expected answer. Mix easy lookups, questions phrased differently from the docs, and exact-term questions (names, error codes, flags).
 **Learn:** Hamel Husain, "Your AI Product Needs Evals" (link in the resource map, section 7).
@@ -91,9 +94,11 @@ Write 20 realistic questions a user would ask. For each, record the chunk id(s) 
 - `data/eval.json` as a list of entries shaped like `{question, gold_ids, expected_answer, category}`, where `category` is `lookup`, `paraphrase` or `exact-term` (task 7 reports Pass@k per category)
 **Done when:** 20 entries, and every `gold_id` exists in `chunks.jsonl`. Write a tiny check script for this.
 **Time:** ~2h
+**Open:**
+- Classic and Signal Forms guides can both answer some questions (e.g. seed question 5); decide whether a question accepts either source. Seed questions: `data/seed-questions.json` (file paths, not chunk ids yet).
 **Result:**
 
-### 5. Expand the eval set to 40+ questions — Not started
+### 5. Expand the eval set to 40+ questions
 **Description**
 Add 20 or more questions. You can have Claude generate candidate questions from random chunks, but review and rewrite each one. Generated questions tend to copy the chunk's wording, which makes retrieval look better than it is.
 **Deliverables**
@@ -104,7 +109,7 @@ Add 20 or more questions. You can have Claude generate candidate questions from 
 
 ## Phase C: Baseline RAG
 
-### 6. Embed all chunks and cache them — Not started
+### 6. Embed all chunks and cache them
 **Description**
 Embed every chunk with a small local embedding model and save the vectors to disk, so you embed once and reuse. Pick a model from the MTEB leaderboard that has an ONNX build usable in transformers.js, and check its model card for the max input length.
 **Learn:** what an embedding is, and why cosine similarity is used to compare them.
@@ -115,7 +120,7 @@ Embed every chunk with a small local embedding model and save the vectors to dis
 **Time:** ~1–2h
 **Result:**
 
-### 7. Vector search + Pass@k eval script → baseline number — Not started
+### 7. Vector search + Pass@k eval script → baseline number
 **Description**
 Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k chunk ids by cosine similarity (dot product over `Float32Array`s of normalized vectors). Write `eval-retrieval.ts`, which runs every eval question and prints Pass@5, Pass@10 and MRR, overall and per question category. Pass@k means "was a gold chunk in the top k?" MRR (mean reciprocal rank) averages 1/rank of the first gold chunk, so it also rewards ranking it higher. Use nDCG only if questions have several gold chunks.
 **Deliverables**
@@ -126,7 +131,7 @@ Write `retrieve_vector(query, k)`, which embeds the query and returns the top-k 
 **Time:** ~2h
 **Result:**
 
-### 8. Generate answers end to end — Not started
+### 8. Generate answers end to end
 **Description**
 Write `ask.ts "question"`. It retrieves the top 5 chunks, puts them in a prompt, and asks Claude to answer *only* from them, or to say "I don't know". Use a current small model; check the Claude models page for the ID.
 **Deliverables**
@@ -138,7 +143,7 @@ Write `ask.ts "question"`. It retrieves the top 5 chunks, puts them in a prompt,
 
 ## Phase D: Better retrieval
 
-### 9. BM25 keyword search on its own — Not started
+### 9. BM25 keyword search on its own
 **Description**
 Add `retrieve_bm25(query, k)` using a BM25 library or SQLite FTS5. Run the same eval. Compare which questions vector search gets right and BM25 misses, and the reverse.
 **Learn:** what BM25 scores and why it wins on exact terms (names, codes) where embeddings struggle.
@@ -149,7 +154,7 @@ Add `retrieve_bm25(query, k)` using a BM25 library or SQLite FTS5. Run the same 
 **Time:** ~1–2h
 **Result:**
 
-### 10. Hybrid search with RRF fusion — Not started
+### 10. Hybrid search with RRF fusion
 **Description**
 Add `retrieve_hybrid`. Take the top 50 from each retriever and merge them with Reciprocal Rank Fusion. Use `k=60`, the standard default; don't tune it yet.
 **Deliverables**
@@ -159,7 +164,7 @@ Add `retrieve_hybrid`. Take the top 50 from each retriever and merge them with R
 **Time:** ~1h
 **Result:**
 
-### 11. Add a reranker — Not started
+### 11. Add a reranker
 **Description**
 Pass hybrid's top ~50 through a local cross-encoder reranker (transformers.js, or the hosted fallback chosen in task 1) and keep the top 10. Unlike embeddings, a cross-encoder reads the query and the chunk together, so it is slower but more accurate. Measure the time per query.
 **Deliverables**
@@ -167,11 +172,13 @@ Pass hybrid's top ~50 through a local cross-encoder reranker (transformers.js, o
 - New row in `results.md`, with an added latency column (ms/query)
 **Done when:** the reranked Pass@k and latency are recorded. Write down whether the accuracy gain is worth the latency.
 **Time:** ~2h
+**Open:**
+- Unverified hypothesis: unchanged pairs scored differently when another pair in the batch changed (7.18 → 6.88), likely because q8 dynamic quantization computes its scale across the batch. Test one pair alone vs in a batch; if true, compare rankings within a batch, not raw scores across batches.
 **Result:**
 
 ## Phase E: Trustworthy answers
 
-### 12. Citations, validated in code — Not started
+### 12. Citations, validated in code
 **Description**
 Switch `ask.ts` to the best retriever. Label chunks `[1]…[n]` in the prompt and require a citation after every claim. After the answer comes back, parse the cited numbers in code, check that each one was actually provided, and print the source file next to it. Then run all eval questions and count valid citations. A valid citation number doesn't mean the chunk supports the claim, so hand-check 20 answers: for each cited claim, does the cited chunk actually say it? (P5's calibrated judge can automate this later.)
 **Deliverables**
@@ -181,7 +188,7 @@ Switch `ask.ts` to the best retriever. Label chunks `[1]…[n]` in the prompt an
 **Time:** ~3–4h
 **Result:**
 
-### 13. Error analysis: read the failures — Not started
+### 13. Error analysis: read the failures
 **Description**
 List every eval question the best retriever still misses. Read each one and label the cause: bad chunking, vocabulary mismatch, bad gold label, or question too vague. Fix the most common cause and re-run.
 **Learn:** this is the core eval skill. Looking at the data beats tuning blindly.
@@ -193,7 +200,7 @@ List every eval question the best retriever still misses. Read each one and labe
 
 ## Phase F: Optional and wrap-up
 
-### 14. (Optional) Contextual retrieval ablation — Not started
+### 14. (Optional) Contextual retrieval ablation
 **Description**
 For each chunk, have Claude write 1–2 sentences that place the chunk within its document. Prepend them to the chunk, then re-embed and re-index. Use prompt caching so the full document isn't paid for on every call. Compare against task 11.
 **Learn:** Anthropic Contextual Retrieval post and cookbook (resource map, section 3).
@@ -204,7 +211,7 @@ For each chunk, have Claude write 1–2 sentences that place the chunk within it
 **Time:** ~2–3h
 **Result:**
 
-### 15. Write-up README with the results table — Not started
+### 15. Write-up README with the results table
 **Description**
 Write the README a hiring manager would read: what the project does, the architecture in 5 lines, the results table (vector → BM25 → hybrid → rerank, with latency), what failed and what you learned, and how to run it.
 **Deliverables**
@@ -214,7 +221,7 @@ Write the README a hiring manager would read: what the project does, the archite
 **Time:** ~1–2h
 **Result:**
 
-### 16. (Optional) Deploy a live demo — Not started
+### 16. (Optional) Deploy a live demo
 **Description**
 The source post stresses deploying projects, not just running them locally. Make `ask.ts` reachable without cloning the repo: a small hosted endpoint, or a hosted page that takes a question and shows the cited answer. Keep it minimal and protect your API key (rate limit, spend cap). If hosting costs or key exposure outweigh the value, a recorded terminal session in the README is an acceptable substitute.
 **Deliverables**

@@ -1,11 +1,11 @@
 # Progress Tracker: Becoming a 10x AI-Native Engineer
 
-Resources for each project are in `ai-native-engineer-resources.md`. Step-by-step task plans live in `tasks/` (one file per project). This file tracks what is actually done. To update it, tell Claude (for example "record progress: RAG baseline works, 40 eval questions").
+Resources for each project are in `ai-native-engineer-resources.md`. Step-by-step task plans live in `tasks/` (one file per project). This file tracks project-level state only: status, checkpoints, repo links. Task-level state (what's done, what's next, open items) lives only in the task plan. To update it, tell Claude (for example "record progress: RAG baseline works, 40 eval questions").
 
 **Rules for keeping it honest**
 - A checkpoint counts only when its evidence exists (demo link, eval result, benchmark number, trace).
 - Record numbers, not feelings. Record what failed too.
-- Update on milestones, not on every message. One milestone updates three places together: the task's `Result` line, the checkpoint and `Status` here, and the log.
+- Update on milestones, not on every message. A finished task updates its task plan only (TOC box + Result line). This file changes when a checkpoint or project Status changes. The log records only what has no task to live in: decisions, workspace changes, checkpoints reached; one line each, pointing at the task Result instead of repeating it.
 
 **Status key:** Not started / In progress / Done
 
@@ -26,13 +26,7 @@ Checkpoints (evidence in brackets):
 - [ ] Short write-up with before/after numbers [README link]
 
 Repo / links: `projects/rag-hybrid-search` (own git repo, local only, not pushed). `main` = TypeScript; branch `python-version` keeps the earlier Python work.
-Notes: Tasks 1–2 done. Corpus (2026-11-22): 91 Angular docs (forms guides + error reference) at `angular/angular@8b15295`. Next: task 3, load and chunk the documents.
-Open items (agreed in chat, raise at the named task; delete once done):
-- Task 3: restructure from the flat `scripts/smoke-test.ts` into code that does real work.
-- Task 3: angular.dev Markdown has custom syntax (`<docs-video>`, `<docs-code>`, `NOTE:`/`TIP:`/`CRITICAL:` callouts) plus code blocks and tables; decide what to strip and what to keep.
-- Task 3: transformers.js caches models in `node_modules/@huggingface/transformers/.cache` (the reranker is 266 MB), so a clean install re-downloads them. Point `env.cacheDir` at a gitignored project folder.
-- Task 4: classic and Signal Forms guides can both answer some questions (e.g. seed question 5); decide whether a question accepts either source. Seed questions: `data/seed-questions.json` (file paths, not chunk ids yet).
-- Task 11 (unverified hypothesis): unchanged pairs scored differently when another pair in the batch changed (7.18 → 6.88), likely because q8 dynamic quantization computes its scale across the batch. Test one pair alone vs in a batch; if true, compare rankings within a batch, not raw scores across batches.
+Current task: first unchecked box in the task plan's TOC.
 
 ## Project 2: Agent + MCP server
 Status: Not started
@@ -144,6 +138,7 @@ Task plan: `tasks/weekend-certs.md` (8 core + 5 optional, phased to match projec
 
 ## Log (newest first)
 
+- 2026-11-22: Tracking cleanup: task state (done/next/open items) now lives only in the task plans; this file keeps project status, checkpoints and the log. Removed the project's `HANDOFF.md` and P1's Notes/Open items (open items moved into tasks 3, 4 and 11).
 - 2026-11-22: Project 1, task 2 done. Corpus: 91 Angular docs Markdown files (`guide/forms` 22 incl. 16 Signal Forms, `reference/errors` 69) from `angular/angular@8b15295` (2026-11-20), MIT license and attribution in the README. First copy nested the error pages in `errors/errors/`, fixed. 8 seed questions (4 error codes, 4 forms) written with their source files; see the task 2 Result. Open question for task 4: classic and Signal Forms guides can both answer some questions.
 - 2026-11-19: Integrated the third source, three PDF project guides (extract in `references/guides-extract.md`; PDFs kept in Google Drive). Checkpoints changed: P1 (MRR and per-category hit rate; citation support on 20 hand-checked answers), P2 (now 6: failures and limits, gateway-lite, attack your own agent; the optional approval step is now part of the defence), P5 (now 5: CI gate, error analysis feeds the dataset, judge calibration), P6 (threshold curve at 4+ thresholds, cache key and invalidation), P7 (ambiguous and unanswerable questions, attack-row format), P4 (concurrency steps, break-even with idle GPU cost), P3 (held-out set, ablation, decision with numbers). Task plans added: `tasks/project-2-agent-mcp.md` (14 tasks), `tasks/project-5-evals.md` (12 tasks); P1 tasks 4, 7 and 12 updated. Weekend certification track moved into `tasks/`. Images renamed. No project work done.
 - 2026-11-18: Project 1, task 1 done. Local embedding (`all-MiniLM-L6-v2-ONNX`, 384 dims, normalized, ~10–15 ms per embed) and local rerank spike passed (`Xenova/bge-reranker-base`, q8, 266 MB): relevant 7.18 vs non-answers 0.25 and 0.39, 3 pairs in ~124–141 ms, cached load ~700 ms. No hosted fallback needed. Findings: the transformers.js `text-classification` pipeline can't score pairs (use tokenizer `text_pair` + `AutoModelForSequenceClassification`), and Node defaults to fp32 unless `dtype: "q8"` is set. A run with a truly unrelated third chunk (CSS Grid) scored 6.88 / -0.26 / -10.18, so off-topic text lands far below near-topic non-answers.
